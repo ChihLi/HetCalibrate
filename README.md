@@ -6,3 +6,4 @@ You can install the package using `install_github` function as follows:
 library(devtools)
 install_github("ChihLi/HetCalibrate")
 ```
+If you want to reproduce the results in [Sung, Barber, and Walker (2023+)](https://arxiv.org/abs/1910.11518), please go to the [reproducibilty webpage](https://github.com/ChihLi/HetCalibrate-Reproducibility).
