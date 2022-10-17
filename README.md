@@ -48,7 +48,6 @@ n.rep <- rep(5, length(X0))
 # setting for lower and upper bounds of parameters
 cpara_min <- -0.3
 cpara_max <- 0.3
-cpara_init.vt <- c(-0.2, 0, 0.2)
 
 # simulate X and Z
 X <- matrix(rep(X0, n.rep), ncol = 1)
