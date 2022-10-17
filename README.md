@@ -18,14 +18,15 @@ set.seed(1)
 f.sim <- function(x, cpara) {
  return(c(exp(x/10)*sin(x) - sqrt(cpara^2 - cpara + 1) * (sin(cpara*x)+cos(cpara*x))))
 }
+# gradient of computer model (for computational ease)
 df.sim <- function(x, cpara) {
  return(c(-sqrt(cpara^2-cpara+1)*(x*cos(x*cpara)-x*sin(x*cpara))-((2*cpara-1)*(sin(x*cpara)+cos(x*cpara)))/(2*sqrt(cpara^2-cpara+1))))
 }
 
-# variance process - constant variance
+# variance process
 var.f <- function(x) (0.01+0.2*(x-pi)^2)^2
 
-# physical process
+# true process
 p.fun <- function(x) exp(x/10)*sin(x)
 
 # true parameter
@@ -35,8 +36,7 @@ true.cpara <- optim(0, fn = function(g) {
 },
 lower = -0.3, upper = 0.3, method = "L-BFGS-B")$par
 
-
-# observed input
+# simulate observed input
 X0 <- seq(0,2*pi, length.out = 8)
 # mean process
 pmean <- p.fun(X0)
@@ -57,16 +57,19 @@ for(i in 1:length(X0)) {
  Z[(ifelse(i==1,0,sum(n.rep[1:(i-1)]))+1):sum(n.rep[1:i])] <- pmean[i] + rnorm(n.rep[i], 0, sd = sqrt(var.y[i]))
 }
 
+# fit the model
 model <- mleHetCalibrate(X = X, Z = Z, cpara_max = cpara_max, cpara_min = cpara_min,
                         lower = 0.01*max(X0), upper = 2.5*max(X0),
                         init = list("cpara" = 0),
                         settings = list(checkHom = FALSE, linkThetas = "none"),
                         covtype = "Matern5_2", orthogonal = TRUE, f.sim = f.sim, df.sim = df.sim)
 
+# print estimated parameter
 print(cpara.Het.OGP <- model$cpara)
 xgrid <- matrix(seq(min(X0), max(X0), length.out = 101), ncol = 1)
 predictions.Het <- predict(x = xgrid, object =  model)
 
+# plot the fitted result
 plot(X, Z, ylab = 'y', xlab = "x")
 Z0 <- hetGP::find_reps(X, Z)$Z0
 points(X0, Z0, pch = 20, cex = 1.2)
