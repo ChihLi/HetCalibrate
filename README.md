@@ -22,8 +22,6 @@ webpage](https://github.com/ChihLi/HetCalibrate-Reproducibility).
 
 An example is given below.
 
-##### Gramacy and Lee (2009) test function
-
 ``` r
 library(HetCalibrate)
 set.seed(1)
