@@ -1,14 +1,29 @@
-# HetCalibrate
-This R package allows calibration parameter estimation for inexact computer models with heteroscedastic errors. More details can be found in [Sung, Barber, and Walker (2022)](https://epubs.siam.org/doi/10.1137/21M1417946).
+HetCalibrate
+================
+Chih-Li Sung
+January 3, 2023
+
+This R package allows calibration parameter estimation for inexact
+computer models with heteroscedastic errors. More details can be found
+in [Sung, Barber, and Walker
+(2022)](https://epubs.siam.org/doi/10.1137/21M1417946).
 
 You can install the package using `install_github` function as follows:
+
 ``` r
 library(devtools)
-install_github("ChihLi/HetCalibrate")
+install_github("ChihLi/GPcluster")
 ```
-If you want to reproduce the results in [Sung, Barber, and Walker (2022)](https://epubs.siam.org/doi/10.1137/21M1417946), please go to the [reproducibilty webpage](https://github.com/ChihLi/HetCalibrate-Reproducibility).
+
+If you want to reproduce the results in [Sung, Barber, and Walker
+(2022)](https://epubs.siam.org/doi/10.1137/21M1417946), please go to the
+[reproducibilty
+webpage](https://github.com/ChihLi/HetCalibrate-Reproducibility).
 
 An example is given below.
+
+##### Gramacy and Lee (2009) test function
+
 ``` r
 library(HetCalibrate)
 set.seed(1)
@@ -65,6 +80,11 @@ model <- mleHetCalibrate(X = X, Z = Z, cpara_max = cpara_max, cpara_min = cpara_
 
 # print estimated parameter
 print(cpara.Het.OGP <- model$cpara)
+```
+
+    ## [1] -0.1727379
+
+``` r
 xgrid <- matrix(seq(min(X0), max(X0), length.out = 101), ncol = 1)
 predictions.Het <- predict(x = xgrid, object =  model)
 
@@ -81,3 +101,4 @@ lines(xgrid, qnorm(0.975, predictions.Het$mean, sqrt(predictions.Het$sd2 + predi
 lines(xgrid, f.sim(xgrid, cpara.Het.OGP), col = 4, lty = 2, lwd = 2)
 ```
 
+<img src="README_files/figure-gfm/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
