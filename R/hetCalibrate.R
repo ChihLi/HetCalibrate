@@ -243,8 +243,9 @@ dlogLikHom <- function(X0, Z0, Z, mult, theta, g, beta0 = NULL, covtype = "Gauss
 ##' @seealso \code{\link[HetCalibrate]{predict.homCalibrate}} for predictions.
 ##' @references
 ##' M. Binois, Robert B. Gramacy, M. Ludkovski (2018), Practical heteroskedastic Gaussian process modeling for large simulation experiments,
-##' Journal of Computational and Graphical Statistics, 27(4), 808--821.\cr
-##' Preprint available on arXiv:1611.05902. \cr \cr
+##' Journal of Computational and Graphical Statistics, 27(4), 808--821.\cr \cr
+##' Sung, C.-L., Barber, B. D., and Walker, B. J. (2022) Calibration of inexact computer models with heteroscedastic errors,
+##' SIAM/ASA Journal on Uncertainty Quantification, 27(4), 808--821. \cr \cr
 ##' @export
 ##' @examples
 ##' ##------------------------------------------------------------
@@ -1470,8 +1471,9 @@ dlogLikHet <- function(X0, Z0, Z, mult, Delta, theta, g, k_theta_g = NULL, theta
 ##' @seealso \code{\link[HetCalibrate]{predict.hetCalibrate}} for predictions.
 ##' @references
 ##' M. Binois, Robert B. Gramacy, M. Ludkovski (2018), Practical heteroskedastic Gaussian process modeling for large simulation experiments,
-##' Journal of Computational and Graphical Statistics, 27(4), 808--821.\cr
-##' Preprint available on arXiv:1611.05902. \cr \cr
+##' Journal of Computational and Graphical Statistics, 27(4), 808--821.\cr \cr
+##' Sung, C.-L., Barber, B. D., and Walker, B. J. (2022) Calibration of inexact computer models with heteroscedastic errors,
+##' SIAM/ASA Journal on Uncertainty Quantification, 27(4), 808--821. \cr \cr
 ##' @export
 ##' @importFrom stats optim var
 ##' @importFrom rootSolve gradient

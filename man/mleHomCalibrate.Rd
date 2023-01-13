@@ -202,8 +202,9 @@ lines(xgrid, f.sim(xgrid, cpara.Hom.OGP), col = 4, lty = 2, lwd = 2)
 }
 \references{
 M. Binois, Robert B. Gramacy, M. Ludkovski (2018), Practical heteroskedastic Gaussian process modeling for large simulation experiments,
-Journal of Computational and Graphical Statistics, 27(4), 808--821.\cr
-Preprint available on arXiv:1611.05902. \cr \cr
+Journal of Computational and Graphical Statistics, 27(4), 808--821.\cr \cr
+Sung, C.-L., Barber, B. D., and Walker, B. J. (2022) Calibration of inexact computer models with heteroscedastic errors,
+SIAM/ASA Journal on Uncertainty Quantification, 27(4), 808--821. \cr \cr
 }
 \seealso{
 \code{\link[HetCalibrate]{predict.homCalibrate}} for predictions.
