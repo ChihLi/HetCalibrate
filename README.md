@@ -12,7 +12,7 @@ You can install the package using `install_github` function as follows:
 
 ``` r
 library(devtools)
-install_github("ChihLi/GPcluster")
+install_github("ChihLi/HetCalibrate")
 ```
 
 If you want to reproduce the results in [Sung, Barber, and Walker
