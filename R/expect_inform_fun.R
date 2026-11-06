@@ -20,9 +20,9 @@ ddKg_ddphi_func <- function(object, arg = 1){
   return(out)
 }
 
-##'Compute Information matrix of a heteroscedastic model object (of class \code{hetCalibrate})
+##'Compute Parameter Covariance Matrix of a Heteroscedastic Model Object (of class \code{hetCalibrate})
 ##' @param object an object of class \code{hetCalibrate}; e.g., as returned by \code{\link[HetCalibrate]{mleHetCalibrate}} with \code{orthogonal=TRUE}
-##' @return a matrix which contains the information matrix of all the parameters. The order of the parameters is \code{cpara}, \code{theta},  \code{nu_hat}, \code{theta_g}, \code{g}, \code{nu_hat_var}, \code{Delta}
+##' @return The inverse negative Hessian after removing the two scale-parameter rows and columns. The retained parameter order is \code{cpara}, \code{theta}, \code{theta_g}, \code{g}, \code{Delta}. Diagonal elements are estimated parameter variances.
 ##' @examples
 ##' ##------------------------------------------------------------
 ##' ## Model calibration under heteroscedastic noises:
@@ -37,7 +37,9 @@ ddKg_ddphi_func <- function(object, arg = 1){
 ##'  return(c(exp(x/10)*sin(x) - sqrt(cpara^2 - cpara + 1) * (sin(cpara*x)+cos(cpara*x))))
 ##'}
 ##'df.sim <- function(x, cpara) {
-##'  return(c(-sqrt(cpara^2-cpara+1)*(x*cos(x*cpara)-x*sin(x*cpara))-((2*cpara-1)*(sin(x*cpara)+cos(x*cpara)))/(2*sqrt(cpara^2-cpara+1))))
+##'  a <- sqrt(cpara^2 - cpara + 1)
+##'  c(-a * x * (cos(x*cpara) - sin(x*cpara)) -
+##'    (2*cpara-1) * (sin(x*cpara) + cos(x*cpara))/(2*a))
 ##'}
 ##'
 ##'# variance process - constant variance
@@ -72,7 +74,8 @@ ddKg_ddphi_func <- function(object, arg = 1){
 ##'X <- matrix(rep(X0, n.rep), ncol = 1)
 ##'Z <- rep(0, sum(n.rep))
 ##'for(i in 1:length(X0)) {
-##'  Z[(ifelse(i==1,0,sum(n.rep[1:(i-1)]))+1):sum(n.rep[1:i])] <- pmean[i] + rnorm(n.rep[i], 0, sd = sqrt(var.y[i]))
+##'  idx <- (sum(n.rep[seq_len(i-1)]) + 1):sum(n.rep[seq_len(i)])
+##'  Z[idx] <- pmean[i] + rnorm(n.rep[i], 0, sd = sqrt(var.y[i]))
 ##'}
 ##'
 ##'model <- mleHetCalibrate(X = X, Z = Z, cpara_max = cpara_max, cpara_min = cpara_min,

@@ -245,7 +245,7 @@ dlogLikHom <- function(X0, Z0, Z, mult, theta, g, beta0 = NULL, covtype = "Gauss
 ##' M. Binois, Robert B. Gramacy, M. Ludkovski (2018), Practical heteroskedastic Gaussian process modeling for large simulation experiments,
 ##' Journal of Computational and Graphical Statistics, 27(4), 808--821.\cr \cr
 ##' Sung, C.-L., Barber, B. D., and Walker, B. J. (2022) Calibration of inexact computer models with heteroscedastic errors,
-##' SIAM/ASA Journal on Uncertainty Quantification, 27(4), 808--821. \cr \cr
+##' SIAM/ASA Journal on Uncertainty Quantification. \doi{10.1137/21M1417946}. \cr \cr
 ##' @export
 ##' @examples
 ##' ##------------------------------------------------------------
@@ -262,7 +262,9 @@ dlogLikHom <- function(X0, Z0, Z, mult, theta, g, beta0 = NULL, covtype = "Gauss
 ##'  return(c(exp(x/10)*sin(x) - sqrt(cpara^2 - cpara + 1) * (sin(cpara*x)+cos(cpara*x))))
 ##'}
 ##'df.sim <- function(x, cpara) {
-##'  return(c(-sqrt(cpara^2-cpara+1)*(x*cos(x*cpara)-x*sin(x*cpara))-((2*cpara-1)*(sin(x*cpara)+cos(x*cpara)))/(2*sqrt(cpara^2-cpara+1))))
+##'  a <- sqrt(cpara^2 - cpara + 1)
+##'  c(-a * x * (cos(x*cpara) - sin(x*cpara)) -
+##'    (2*cpara-1) * (sin(x*cpara) + cos(x*cpara))/(2*a))
 ##'}
 ##'
 ##'# variance process - constant variance
@@ -297,7 +299,8 @@ dlogLikHom <- function(X0, Z0, Z, mult, theta, g, beta0 = NULL, covtype = "Gauss
 ##'X <- matrix(rep(X0, n.rep), ncol = 1)
 ##'Z <- rep(0, sum(n.rep))
 ##'for(i in 1:length(X0)) {
-##'  Z[(ifelse(i==1,0,sum(n.rep[1:(i-1)]))+1):sum(n.rep[1:i])] <- pmean[i] + rnorm(n.rep[i], 0, sd = sqrt(var.y[i]))
+##'  idx <- (sum(n.rep[seq_len(i-1)]) + 1):sum(n.rep[seq_len(i)])
+##'  Z[idx] <- pmean[i] + rnorm(n.rep[i], 0, sd = sqrt(var.y[i]))
 ##'}
 ##'
 ##'model <- mleHomCalibrate(X = X, Z = Z, cpara_max = cpara_max, cpara_min = cpara_min,
@@ -520,7 +523,7 @@ mleHomCalibrate <- function(X, Z, cpara_max = NULL, cpara_min = NULL, lower = NU
                      cpara = known$cpara, orthogonal = orthogonal, f.sim = f.sim, df.sim = df.sim, MC.num = MC.num, inputBounds = inputBounds,
                      control = list(fnscale = -1, maxit = maxit, factr = 1e9), env = envtmp))
     ## Catch errors when at least one likelihood evaluation worked
-    if(class(out) == "try-error")
+    if(inherits(out, "try-error"))
       out <- list(par = envtmp$arg_max, value = envtmp$max_loglik, counts = NA,
                   message = "Optimization stopped due to NAs, use best value so far")
 
@@ -1407,7 +1410,7 @@ dlogLikHet <- function(X0, Z0, Z, mult, Delta, theta, g, k_theta_g = NULL, theta
 ##'   \item \code{checkHom} when \code{TRUE}, if the log-likelihood with a homoskedastic model is better, then return it.
 ##'   \item \code{trace} optional scalar (default to \code{0}). If positive, tracing information on the fitting process.
 ##' If \code{1}, information is given about the result of the heterogeneous model optimization.
-##' Level \code{2} gives more details. Level {3} additionaly displays all details about initialization of hyperparameters.
+##' Level \code{2} gives more details. Level \code{3} additionally displays all details about initialization of hyperparameters.
 ##' \item \code{return.matrices} boolean to include the inverse covariance matrix in the object for further use (e.g., prediction).
 ##' \item \code{return.hom} boolean to include homoskedastic GP models used for initialization (i.e., \code{modHom} and \code{modNugs}).
 ##' }
@@ -1473,9 +1476,9 @@ dlogLikHet <- function(X0, Z0, Z, mult, Delta, theta, g, k_theta_g = NULL, theta
 ##' M. Binois, Robert B. Gramacy, M. Ludkovski (2018), Practical heteroskedastic Gaussian process modeling for large simulation experiments,
 ##' Journal of Computational and Graphical Statistics, 27(4), 808--821.\cr \cr
 ##' Sung, C.-L., Barber, B. D., and Walker, B. J. (2022) Calibration of inexact computer models with heteroscedastic errors,
-##' SIAM/ASA Journal on Uncertainty Quantification, 27(4), 808--821. \cr \cr
+##' SIAM/ASA Journal on Uncertainty Quantification. \doi{10.1137/21M1417946}. \cr \cr
 ##' @export
-##' @importFrom stats optim var
+##' @importFrom stats optim var predict quantile uniroot
 ##' @importFrom rootSolve gradient
 ##' @importFrom randtoolbox sobol
 ##' @import hetGP
@@ -1494,7 +1497,9 @@ dlogLikHet <- function(X0, Z0, Z, mult, Delta, theta, g, k_theta_g = NULL, theta
 ##'  return(c(exp(x/10)*sin(x) - sqrt(cpara^2 - cpara + 1) * (sin(cpara*x)+cos(cpara*x))))
 ##'}
 ##'df.sim <- function(x, cpara) {
-##'  return(c(-sqrt(cpara^2-cpara+1)*(x*cos(x*cpara)-x*sin(x*cpara))-((2*cpara-1)*(sin(x*cpara)+cos(x*cpara)))/(2*sqrt(cpara^2-cpara+1))))
+##'  a <- sqrt(cpara^2 - cpara + 1)
+##'  c(-a * x * (cos(x*cpara) - sin(x*cpara)) -
+##'    (2*cpara-1) * (sin(x*cpara) + cos(x*cpara))/(2*a))
 ##'}
 ##'
 ##'# variance process - constant variance
@@ -1529,7 +1534,8 @@ dlogLikHet <- function(X0, Z0, Z, mult, Delta, theta, g, k_theta_g = NULL, theta
 ##'X <- matrix(rep(X0, n.rep), ncol = 1)
 ##'Z <- rep(0, sum(n.rep))
 ##'for(i in 1:length(X0)) {
-##'  Z[(ifelse(i==1,0,sum(n.rep[1:(i-1)]))+1):sum(n.rep[1:i])] <- pmean[i] + rnorm(n.rep[i], 0, sd = sqrt(var.y[i]))
+##'  idx <- (sum(n.rep[seq_len(i-1)]) + 1):sum(n.rep[seq_len(i)])
+##'  Z[idx] <- pmean[i] + rnorm(n.rep[i], 0, sd = sqrt(var.y[i]))
 ##'}
 ##'
 ##'model <- mleHetCalibrate(X = X, Z = Z, cpara_max = cpara_max, cpara_min = cpara_min,
@@ -2176,7 +2182,7 @@ mleHetCalibrate <- function(X, Z, cpara_max = NULL, cpara_min = NULL, lower = NU
                      control = list(fnscale = -1, maxit = maxit, factr = 1e9)))
 
     ## Catch errors when at least one likelihood evaluation worked
-    if(class(out) == "try-error")
+    if(inherits(out, "try-error"))
       out <- list(par = envtmp$arg_max, value = envtmp$max_loglik, counts = NA,
                   message = "Optimization stopped due to NAs, use best value so far")
 
@@ -2575,48 +2581,48 @@ predict.hetCalibrate <- function(object, x, noise.var = FALSE, xprime = NULL, nu
 #   return(object)
 # }
 
-#'
-#' ###############################################################################
-#' ## Appendix: low level functions
-#' ###############################################################################
-#'
-#' ##' Prepare data for use with \code{\link[hetGP]{mleHetGP}}, in particular to find replicated observations
-#' ##' @title Data preprocessing
-#' ##' @param X matrix of design locations, one point per row
-#' ##' @param Z vector of observations at \code{X}
-#' ##' @param return.Zlist to return \code{Zlist}, see below
-#' ##' @param rescale if \code{TRUE}, the inputs are rescaled to the unit hypercube
-#' ##' @param normalize if \code{TRUE}, the outputs are centered and normalized
-#' ##' @param inputBounds optional matrix of known boundaries in original input space, of size 2 times \code{ncol(X)}.
-#' ##' If not provided, and \code{rescale == TRUE}, it is estimated from the data.
-#' ##' @return A list with the following elements that can be passed to the main fitting functions, e.g., \code{\link{mleHetGP}} and \code{\link{mleHomGP}}
-#' ##' \itemize{
-#' ##' \item \code{X0} matrix with unique designs locations, one point per row,
-#' ##' \item \code{Z0} vector of averaged observations at \code{X0},
-#' ##' \item \code{mult} number of replicates at \code{X0},
-#' ##' \item \code{Z} vector with all observations, sorted according to \code{X0},
-#' ##' \item \code{Zlist} optional list, each element corresponds to observations at a design in \code{X0},
-#' ##' \item \code{inputBounds} optional matrix, to rescale back to the original input space,
-#' ##' \item \code{outputStats} optional vector, with mean and variance of the original outputs.
-#' ##' }
-#' ##' @details Replicates are searched based on character representation, using \code{\link[base]{unique}}.
-#' ##' @examples
-#' ##' ##------------------------------------------------------------
-#' ##' ## Find replicates on the motorcycle data
-#' ##' ##------------------------------------------------------------
-#' ##' ## motorcycle data
-#' ##' library(MASS)
-#' ##'
-#' ##' X <- matrix(mcycle$times, ncol = 1)
-#' ##' Z <- mcycle$accel
-#' ##'
-#' ##' data_m <- find_reps(X, Z)
-#' ##'
-#' ##' # Initial data
-#' ##' plot(X, Z, ylim = c(-160, 90), ylab = 'acceleration', xlab = "time")
-#' ##' # Display mean values
-#' ##' points(data_m$X0, data_m$Z0, pch = 20)
-#' ##' @export
+#
+# ###############################################################################
+# ## Appendix: low level functions
+# ###############################################################################
+#
+# ##' Prepare data for use with \code{\link[hetGP]{mleHetGP}}, in particular to find replicated observations
+# ##' @title Data preprocessing
+# ##' @param X matrix of design locations, one point per row
+# ##' @param Z vector of observations at \code{X}
+# ##' @param return.Zlist to return \code{Zlist}, see below
+# ##' @param rescale if \code{TRUE}, the inputs are rescaled to the unit hypercube
+# ##' @param normalize if \code{TRUE}, the outputs are centered and normalized
+# ##' @param inputBounds optional matrix of known boundaries in original input space, of size 2 times \code{ncol(X)}.
+# ##' If not provided, and \code{rescale == TRUE}, it is estimated from the data.
+# ##' @return A list with the following elements that can be passed to the main fitting functions, e.g., \code{\link{mleHetGP}} and \code{\link{mleHomGP}}
+# ##' \itemize{
+# ##' \item \code{X0} matrix with unique designs locations, one point per row,
+# ##' \item \code{Z0} vector of averaged observations at \code{X0},
+# ##' \item \code{mult} number of replicates at \code{X0},
+# ##' \item \code{Z} vector with all observations, sorted according to \code{X0},
+# ##' \item \code{Zlist} optional list, each element corresponds to observations at a design in \code{X0},
+# ##' \item \code{inputBounds} optional matrix, to rescale back to the original input space,
+# ##' \item \code{outputStats} optional vector, with mean and variance of the original outputs.
+# ##' }
+# ##' @details Replicates are searched based on character representation, using \code{\link[base]{unique}}.
+# ##' @examples
+# ##' ##------------------------------------------------------------
+# ##' ## Find replicates on the motorcycle data
+# ##' ##------------------------------------------------------------
+# ##' ## motorcycle data
+# ##' library(MASS)
+# ##'
+# ##' X <- matrix(mcycle$times, ncol = 1)
+# ##' Z <- mcycle$accel
+# ##'
+# ##' data_m <- find_reps(X, Z)
+# ##'
+# ##' # Initial data
+# ##' plot(X, Z, ylim = c(-160, 90), ylab = 'acceleration', xlab = "time")
+# ##' # Display mean values
+# ##' points(data_m$X0, data_m$Z0, pch = 20)
+# ##' @export
 find_reps <- function(X, Z, return.Zlist = TRUE, rescale = FALSE, normalize = FALSE, inputBounds = NULL){
   if(is.null(dim(X)))
     X <- matrix(X, ncol = 1)
@@ -2659,15 +2665,15 @@ find_reps <- function(X, Z, return.Zlist = TRUE, rescale = FALSE, normalize = FA
   return(list(X0 = X0, Z0 = unlist(lapply(Zlist, mean)), mult = mult, Z = unlist(Zlist), inputBounds = inputBounds,
               outputStats = outputStats))
 }
-#' #'
-#' #' Defines lower bound for lengthscale parameters based on a low quantile of non-zero distances between points in the design.
-#' #' @param X design matrix
-#' #' @param min_cor minimal correlation between two design points at the defined quantile distance, default to 0.01
-#' #' @param max_cor maximal correlation between two design points at the defined (1-p) quantile distance, default to 0.5
-#' #' @param p quantile on distances, default to 0.1
-#' #' @param covtype covariance function used
-#' #' @importFrom stats quantile uniroot
-#' #' @noRd
+# #'
+# #' Defines lower bound for lengthscale parameters based on a low quantile of non-zero distances between points in the design.
+# #' @param X design matrix
+# #' @param min_cor minimal correlation between two design points at the defined quantile distance, default to 0.01
+# #' @param max_cor maximal correlation between two design points at the defined (1-p) quantile distance, default to 0.5
+# #' @param p quantile on distances, default to 0.1
+# #' @param covtype covariance function used
+# #' @importFrom stats quantile uniroot
+# #' @noRd
 auto_bounds <- function(X, min_cor = 0.01, max_cor = 0.5, covtype = "Gaussian", p = 0.05){
   Xsc <- find_reps(X, rep(1, nrow(X)), rescale = T) # rescaled distances
 
@@ -2692,9 +2698,9 @@ auto_bounds <- function(X, min_cor = 0.01, max_cor = 0.5, covtype = "Gaussian", 
                 upper = max(1, theta_max) * (Xsc$inputBounds[2,] - Xsc$inputBounds[1,])))
   }
 }
-#'
-#' # Rho function for SiNK prediction, anistropic case
-#' ## @param covtype covariance kernel type, either 'Gaussian' or 'Matern5_2'
+#
+# # Rho function for SiNK prediction, anistropic case
+# ## @param covtype covariance kernel type, either 'Gaussian' or 'Matern5_2'
 rho_AN <- function(xx, X0, theta_g, g, sigma = 1, type = "Gaussian", SiNK_eps = 1e-4, eps = sqrt(.Machine$double.eps), mult){
   if(is.null(nrow(xx)))
     xx <- matrix(xx, nrow = 1)
