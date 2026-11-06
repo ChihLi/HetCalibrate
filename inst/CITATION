@@ -1,0 +1,6 @@
+bibentry("Article",
+  title = "Calibration of Inexact Computer Models with Heteroscedastic Errors",
+  author = c(person("Chih-Li", "Sung"), person("Beau David", "Barber"),
+             person("Berkley J.", "Walker")),
+  journal = "SIAM/ASA Journal on Uncertainty Quantification",
+  year = "2022", doi = "10.1137/21M1417946")

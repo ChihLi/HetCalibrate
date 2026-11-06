@@ -1,0 +1,7 @@
+R/hetCalibrate.R and R/Covariance_functions.R contain routines adapted
+from hetGP by Mickael Binois and Robert B. Gramacy, distributed under the
+GNU Lesser General Public License (LGPL). The original authors retain
+copyright in their contributions. These adaptations are distributed as
+part of HetCalibrate under GPL-2 | GPL-3, consistent with the LGPL terms.
+Source: https://CRAN.R-project.org/package=hetGP
+Calibration modifications: Chih-Li Sung.

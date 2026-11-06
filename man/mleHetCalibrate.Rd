@@ -62,7 +62,7 @@ Same as for \code{theta} if not provided.
   \item \code{checkHom} when \code{TRUE}, if the log-likelihood with a homoskedastic model is better, then return it.
   \item \code{trace} optional scalar (default to \code{0}). If positive, tracing information on the fitting process.
 If \code{1}, information is given about the result of the heterogeneous model optimization.
-Level \code{2} gives more details. Level {3} additionaly displays all details about initialization of hyperparameters.
+Level \code{2} gives more details. Level \code{3} additionally displays all details about initialization of hyperparameters.
 \item \code{return.matrices} boolean to include the inverse covariance matrix in the object for further use (e.g., prediction).
 \item \code{return.hom} boolean to include homoskedastic GP models used for initialization (i.e., \code{modHom} and \code{modNugs}).
 }}
@@ -150,7 +150,9 @@ f.sim <- function(x, cpara) {
  return(c(exp(x/10)*sin(x) - sqrt(cpara^2 - cpara + 1) * (sin(cpara*x)+cos(cpara*x))))
 }
 df.sim <- function(x, cpara) {
- return(c(-sqrt(cpara^2-cpara+1)*(x*cos(x*cpara)-x*sin(x*cpara))-((2*cpara-1)*(sin(x*cpara)+cos(x*cpara)))/(2*sqrt(cpara^2-cpara+1))))
+ a <- sqrt(cpara^2 - cpara + 1)
+ c(-a * x * (cos(x*cpara) - sin(x*cpara)) -
+   (2*cpara-1) * (sin(x*cpara) + cos(x*cpara))/(2*a))
 }
 
 # variance process - constant variance
@@ -185,7 +187,8 @@ cpara_init.vt <- c(-0.2, 0, 0.2)
 X <- matrix(rep(X0, n.rep), ncol = 1)
 Z <- rep(0, sum(n.rep))
 for(i in 1:length(X0)) {
- Z[(ifelse(i==1,0,sum(n.rep[1:(i-1)]))+1):sum(n.rep[1:i])] <- pmean[i] + rnorm(n.rep[i], 0, sd = sqrt(var.y[i]))
+ idx <- (sum(n.rep[seq_len(i-1)]) + 1):sum(n.rep[seq_len(i)])
+ Z[idx] <- pmean[i] + rnorm(n.rep[i], 0, sd = sqrt(var.y[i]))
 }
 
 model <- mleHetCalibrate(X = X, Z = Z, cpara_max = cpara_max, cpara_min = cpara_min,
@@ -239,7 +242,7 @@ lines(xgrid, f.sim(xgrid, cpara.Het.OGP), col = 4, lty = 2, lwd = 2)
 M. Binois, Robert B. Gramacy, M. Ludkovski (2018), Practical heteroskedastic Gaussian process modeling for large simulation experiments,
 Journal of Computational and Graphical Statistics, 27(4), 808--821.\cr \cr
 Sung, C.-L., Barber, B. D., and Walker, B. J. (2022) Calibration of inexact computer models with heteroscedastic errors,
-SIAM/ASA Journal on Uncertainty Quantification, 27(4), 808--821. \cr \cr
+SIAM/ASA Journal on Uncertainty Quantification. \doi{10.1137/21M1417946}. \cr \cr
 }
 \seealso{
 \code{\link[HetCalibrate]{predict.hetCalibrate}} for predictions.

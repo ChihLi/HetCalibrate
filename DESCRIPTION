@@ -2,14 +2,19 @@ Package: HetCalibrate
 Type: Package
 Title: Calibration of Inexact Computer Models with Heteroscedastic Errors
 Version: 0.2
-Author: Chih-Li Sung
-Maintainer: Chih-Li Sung <iamdfchile@gmail.com>
+Authors@R: c(
+    person("Chih-Li", "Sung", email = "iamdfchile@gmail.com", role = c("aut", "cre")),
+    person("Mickael", "Binois", role = "ctb", comment = "hetGP routines"),
+    person("Robert B.", "Gramacy", role = "ctb", comment = "hetGP routines"))
 Description:
-    Allows calibration parameter estimation for inexact computer models with heteroscedastic errors. More details can be seen in Sung, Barber, Walker (2022).
+    Estimates calibration parameters of inexact computer models using
+    replicated observations with input-dependent measurement variances.
+    Gaussian process models describe model discrepancy and heteroscedastic
+    errors, with an optional orthogonal discrepancy process. Implements
+    the method of Sung, Barber, and Walker (2022) <doi:10.1137/21M1417946>.
 License: GPL-2 | GPL-3
 Encoding: UTF-8
-LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.2
 Depends:
     R (>= 3.5.1)
 Imports:
@@ -18,3 +23,5 @@ Imports:
     methods,
     rootSolve,
     randtoolbox
+URL: https://github.com/ChihLi/HetCalibrate
+BugReports: https://github.com/ChihLi/HetCalibrate/issues
